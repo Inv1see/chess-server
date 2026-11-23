@@ -73,7 +73,7 @@ app.get('/api/profile', (req, res) => {
     const login = tokens[req.headers.authorization];
     if (!login) return res.status(401).json({ error: 'Не авторизован' });
     const { wins, losses, avatar } = users[login];
-    res.json({ login, wins, losses, rating: 1000, avatar });
+    res.json({ login, wins, losses, rating: 0, avatar });
 });
 app.post('/api/avatar', (req, res) => {
     const login = tokens[req.headers.authorization];
