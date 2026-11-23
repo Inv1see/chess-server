@@ -6,8 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 const server = http.createServer(app);
 
-// Разрешаем подключение с твоего сайта на Netlify
-// ВАЖНО: замени на свой реальный адрес Netlify!
+// Разрешаем подключение на Netlify
 const io = new Server(server, {
     cors: {
         origin: [
@@ -19,7 +18,7 @@ const io = new Server(server, {
     }
 });
 
-// Простой health-check, чтобы Render видел, что сервер живой
+
 app.get('/', (req, res) => {
     res.send('Chess server is running');
 });
@@ -55,13 +54,15 @@ io.on('connection', (socket) => {
         socket.join(roomId);
         socket.roomId = roomId;
 
-        // Другу — цвет black и текущая позиция
-        socket.emit('gameStarted', { color: 'b', fen: room.fen });
+        // Рандомный выбор цвета создателя
+        const creatorColor = Math.random() < 0.5 ? 'w' : 'b';
+        const joinerColor = creatorColor === 'w' ? 'b' : 'w';
 
-        // Создателю — сообщение, что соперник зашёл
-        io.to(room.players[0]).emit('opponentJoined');
+        // Обоим игрокам — их цвет и текущая позиция
+        socket.emit('gameStarted', { color: joinerColor, fen: room.fen });
+        io.to(room.players[0]).emit('gameStarted', { color: creatorColor, fen: room.fen });
 
-        console.log(`Игрок ${socket.id} зашёл в комнату ${roomId}`);
+        console.log(`Игрок ${socket.id} зашёл в комнату ${roomId}. Создатель: ${creatorColor === 'w' ? 'белые' : 'черные'}`);
     });
 
     // Пересылка хода
