@@ -9,6 +9,13 @@ const server = http.createServer(app);
 const crypto = require('crypto');
 
 app.use(express.json());
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'https://bestchess-pa1n-vagyuk.netlify.app');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    if (req.method === 'OPTIONS') return res.sendStatus(204);  // preflight-запрос браузера
+    next();
+});
 
 const users = {};   // { логин: { salt, hash, wins, losses, avatar } }
 const tokens = {};  // { токен: логин }
